@@ -161,8 +161,10 @@ void setup()
 }
 void loop()
 {
+  
 	lcd.setCursor(0,0);
 	lcd.print("TIME");
+  	Nhietdo();
 	Tinhgio();
 	Op = digitalRead(Option);
 	if (Op==LOW) {a=1; delay(100);} //Che do thoi gian
@@ -180,9 +182,9 @@ void loop()
 			lcd.setCursor(0,0);
 			lcd.clear();
 			lcd.print("ALARM");
-			Hienthi(hourA,minuteA,secondA);
-			TangGiam(4); //vi tri giay cua bao thuc trong ham Chinhgio()
+			//Hienthi(hourA,minuteA,secondA);
 			Giobaothuc(hourA,minuteA,secondA);
+			TangGiam(4); //vi tri giay cua bao thuc trong ham Chinhgio()	
 			a=0;
 		}
 		
@@ -214,33 +216,32 @@ void TangGiam(int vitri1)
 {
 	delay(200);
   	Ok=HIGH;
-	while ((Ok==HIGH) && (vitri1!=0))
+	while (vitri1!=0)
 	{
-      if (0<vitri1<4) 
+      if ((vitri1==1)||(vitri1==2)||(vitri1==3))  
       {
         Tinhgio();
-		Nhapnhay(vitri1);
       	Inc = digitalRead(Increase);
 		Dec = digitalRead(Decrease);
 		Op = digitalRead(Option);
 		Ok = digitalRead(OK);
 		if ((Op==LOW) && (vitri1<3)) {vitri1 +=1; delay(100);}
       	else if ((Op==LOW) && (vitri1=3)) {vitri1 = 0; delay(100);} 
-		if (Ok==LOW) {break;}		
+		if (Ok==LOW) {vitri1=0;}		
 		if (Inc==LOW) {Chinhgio(vitri1,1);}
         if (Dec==LOW) {dieukien(vitri1,-1);}
       }
       
-      if (3<vitri1<7) 
+      if ((vitri1==4)||(vitri1==5)||(vitri1==6)) 
       {
-		Nhapnhay(vitri1);
+        Hienthi(hourA,minuteA,secondA);
       	Inc = digitalRead(Increase);
 		Dec = digitalRead(Decrease);
 		Op = digitalRead(Option);
 		Ok = digitalRead(OK);
-		if ((Op==LOW) && (vitri1<3)) {vitri1 +=1; delay(100);}
-      	else if ((Op==LOW) && (vitri1=3)) {vitri1 = 0; delay(100);} 
-		if (Ok==LOW) {break;}		
+		if ((Op==LOW) && (vitri1<6)) {vitri1 +=1; delay(100);}
+      	else if ((Op==LOW) && (vitri1=6)) {vitri1 = 0; delay(100);} 
+		if (Ok==LOW) {vitri1=0;}		
 		if (Inc==LOW) {Chinhgio(vitri1,1);}
         if (Dec==LOW) {dieukien(vitri1,-1);}
       }
@@ -271,9 +272,9 @@ void Chinhgio(int vitri, int plus1)
 		break;
 		case 4: secondA+=plus1;			//giay bao thuc
 		break;
-		case 5: secondA+=(plus1*60);		//phut bao thuc
+		case 5: minuteA+=plus1;		//phut bao thuc
 		break;
-		case 6: secondA+=(plus1*3600);	//gio bao thuc
+		case 6: hourA+=plus1;	//gio bao thuc
 		break;
 		default:
 		break;
@@ -301,41 +302,14 @@ void Hienthi(unsigned long h, unsigned long m, unsigned long s)
   lcd.print(s);
 }
 
-void Nhapnhay(int vitri)
+void Nhietdo()
 {
-  	
-  	delay(50);
-	switch(vitri)
-	{
-		case 1:
-		lcd.setCursor(6,1);
-		lcd.print("  ");
-      	Hienthi(hour,minute,second);
-		break;
-		case 2:
-		lcd.setCursor(3,1);
-		lcd.print("  ");
-      	Hienthi(hour,minute,second);
-		break;
-		case 3:
-		lcd.setCursor(0,1);
-		lcd.print("  ");
-      	Hienthi(hour,minute,second);
-		break;
-		case 4:
-		lcd.setCursor(6,1);
-		lcd.print("  ");
-      	Hienthi(hourA,minuteA,secondA);
-		break;
-		case 5:
-		lcd.setCursor(3,1);
-		lcd.print("  ");
-      	Hienthi(hourA,minuteA,secondA);
-		break;
-		case 6:
-		lcd.setCursor(0,1);
-		lcd.print("  ");
-      	Hienthi(hourA,minuteA,secondA);
-		break;
-	}
+  int reading = analogRead(Tem);  
+  float voltage = reading * 5.0 / 1024.0; 
+  float temp = voltage * 100.0; 
+    lcd.setCursor(12,0);
+  lcd.print(temp);
+    lcd.setCursor(14,1);
+    lcd.print("oC");
+  delay(100);
 }
