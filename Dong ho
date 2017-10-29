@@ -1,0 +1,341 @@
+#include <stdio.h>
+#include <LiquidCrystal.h>
+
+#define NOTE_C4  262   
+#define NOTE_D4  294
+#define NOTE_E4  330
+#define NOTE_F4  349
+#define NOTE_G4  392
+#define NOTE_A4  440
+#define NOTE_B4  494
+#define NOTE_C5  523
+#define NOTE_D5  587
+#define NOTE_E5  659
+#define NOTE_F5  698
+#define NOTE_G5  784
+#define NOTE_A5  880
+#define NOTE_B5  988
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+//Phan am thanh
+const int buzzer = 13; 
+const int songspeed = 1.5;
+//Phan thoi gian
+unsigned long Time{0};
+unsigned long t;
+unsigned long second{0};
+unsigned long minute{0};
+unsigned long hour{0};
+unsigned long secondA{0};
+unsigned long minuteA{0};
+unsigned long hourA{0};
+long PLUS{0};
+//Phan doc tin hieu
+int Tem=A0;
+int Option = 10;
+int Increase = 9;
+int Decrease = 8;
+int OK = 7;
+//Phan dieu khien
+int Op=HIGH;
+int Inc=HIGH;
+int Dec=HIGH;
+int Ok=HIGH;
+int a;
+int b;
+//Giai dieu
+int notes[] = {   
+   NOTE_E4, NOTE_G4, NOTE_A4, NOTE_A4, 0, 
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_C5, NOTE_D5, NOTE_B4, NOTE_B4, 0,
+   NOTE_A4, NOTE_G4, NOTE_A4, 0,
+   
+   NOTE_E4, NOTE_G4, NOTE_A4, NOTE_A4, 0, 
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_C5, NOTE_D5, NOTE_B4, NOTE_B4, 0,
+   NOTE_A4, NOTE_G4, NOTE_A4, 0,
+   
+   NOTE_E4, NOTE_G4, NOTE_A4, NOTE_A4, 0, 
+   NOTE_A4, NOTE_C5, NOTE_D5, NOTE_D5, 0, 
+   NOTE_D5, NOTE_E5, NOTE_F5, NOTE_F5, 0,
+   NOTE_E5, NOTE_D5, NOTE_E5, NOTE_A4, 0,
+   
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_D5, NOTE_E5, NOTE_A4, 0, 
+   NOTE_A4, NOTE_C5, NOTE_B4, NOTE_B4, 0,
+   NOTE_C5, NOTE_A4, NOTE_B4, 0,
+
+   NOTE_A4, NOTE_A4, 
+ 
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_C5, NOTE_D5, NOTE_B4, NOTE_B4, 0,
+   NOTE_A4, NOTE_G4, NOTE_A4, 0,
+
+   NOTE_E4, NOTE_G4, NOTE_A4, NOTE_A4, 0, 
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_C5, NOTE_D5, NOTE_B4, NOTE_B4, 0,
+   NOTE_A4, NOTE_G4, NOTE_A4, 0,
+   
+   NOTE_E4, NOTE_G4, NOTE_A4, NOTE_A4, 0, 
+   NOTE_A4, NOTE_C5, NOTE_D5, NOTE_D5, 0, 
+   NOTE_D5, NOTE_E5, NOTE_F5, NOTE_F5, 0,
+   NOTE_E5, NOTE_D5, NOTE_E5, NOTE_A4, 0,
+   
+   NOTE_A4, NOTE_B4, NOTE_C5, NOTE_C5, 0, 
+   NOTE_D5, NOTE_E5, NOTE_A4, 0, 
+   NOTE_A4, NOTE_C5, NOTE_B4, NOTE_B4, 0,
+   NOTE_C5, NOTE_A4, NOTE_B4, 0,
+   
+
+   NOTE_E5, 0, 0, NOTE_F5, 0, 0,
+   NOTE_E5, NOTE_E5, 0, NOTE_G5, 0, NOTE_E5, NOTE_D5, 0, 0,
+   NOTE_D5, 0, 0, NOTE_C5, 0, 0,
+   NOTE_B4, NOTE_C5, 0, NOTE_B4, 0, NOTE_A4,
+
+   NOTE_E5, 0, 0, NOTE_F5, 0, 0,
+   NOTE_E5, NOTE_E5, 0, NOTE_G5, 0, NOTE_E5, NOTE_D5, 0, 0,
+   NOTE_D5, 0, 0, NOTE_C5, 0, 0,
+   NOTE_B4, NOTE_C5, 0, NOTE_B4, 0, NOTE_A4
+};
+//Truong do
+int duration[] = {         
+  125, 125, 250, 125, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 375, 125, 
+  
+  125, 125, 250, 125, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 375, 125, 
+  
+  125, 125, 250, 125, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 125, 250, 125,
+
+  125, 125, 250, 125, 125, 
+  250, 125, 250, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 375, 375,
+
+  250, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 375, 125, 
+  
+  125, 125, 250, 125, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 375, 125, 
+  
+  125, 125, 250, 125, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 250, 125, 125,
+  125, 125, 125, 250, 125,
+
+  125, 125, 250, 125, 125, 
+  250, 125, 250, 125, 
+  125, 125, 250, 125, 125,
+  125, 125, 375, 375,
+  
+  250, 125, 375, 250, 125, 375,
+  125, 125, 125, 125, 125, 125, 125, 125, 375,
+  250, 125, 375, 250, 125, 375,
+  125, 125, 125, 125, 125, 500,
+
+  250, 125, 375, 250, 125, 375,
+  125, 125, 125, 125, 125, 125, 125, 125, 375,
+  250, 125, 375, 250, 125, 375,
+  125, 125, 125, 125, 125, 500
+};
+//*****************************************************
+
+void setup() 
+{
+  lcd.begin(16, 2);
+  pinMode(Option,INPUT_PULLUP);
+  pinMode(Increase,INPUT_PULLUP);
+  pinMode(Decrease,INPUT_PULLUP);
+  pinMode(OK,INPUT_PULLUP);
+}
+void loop()
+{
+	lcd.setCursor(0,0);
+	lcd.print("TIME");
+	Tinhgio();
+	Op = digitalRead(Option);
+	if (Op==LOW) {a=1; delay(100);} //Che do thoi gian
+	while (a==1)
+	{
+      	Tinhgio();
+		lcd.setCursor(0,0);
+		lcd.print("    ");
+		lcd.setCursor(0,0);
+		lcd.print("TIME");
+		
+		Op = digitalRead(Option);	//Chuyen sang che do dat gio bao thuc
+		if (Op==LOW)
+		{
+			lcd.setCursor(0,0);
+			lcd.clear();
+			lcd.print("ALARM");
+			Hienthi(hourA,minuteA,secondA);
+			TangGiam(4); //vi tri giay cua bao thuc trong ham Chinhgio()
+			Giobaothuc(hourA,minuteA,secondA);
+			a=0;
+		}
+		
+		Ok = digitalRead(OK); //Chon che do dat gio cho thoi gian
+		if (Ok==LOW) 
+		{
+          	lcd.setCursor(0,0);
+			lcd.print("     ");
+			lcd.setCursor(0,0);
+			lcd.print("TIME");
+			Tinhgio();
+			TangGiam(1); //vi tri giay cua thoi gian trong ham Chinhgio()
+			a=0;
+		} 
+	}
+}
+
+void Tinhgio()
+{
+	Time=millis()/100;
+	t=Time+PLUS;
+  	second=t%60;
+	minute=(t/60)%60;
+	hour=(t/3600)%24;
+	Hienthi(hour,minute,second);
+}
+
+void TangGiam(int vitri1)
+{
+	delay(200);
+  	Ok=HIGH;
+	while ((Ok==HIGH) && (vitri1!=0))
+	{
+      if (0<vitri1<4) 
+      {
+        Tinhgio();
+		Nhapnhay(vitri1);
+      	Inc = digitalRead(Increase);
+		Dec = digitalRead(Decrease);
+		Op = digitalRead(Option);
+		Ok = digitalRead(OK);
+		if ((Op==LOW) && (vitri1<3)) {vitri1 +=1; delay(100);}
+      	else if ((Op==LOW) && (vitri1=3)) {vitri1 = 0; delay(100);} 
+		if (Ok==LOW) {break;}		
+		if (Inc==LOW) {Chinhgio(vitri1,1);}
+        if (Dec==LOW) {dieukien(vitri1,-1);}
+      }
+      
+      if (3<vitri1<7) 
+      {
+		Nhapnhay(vitri1);
+      	Inc = digitalRead(Increase);
+		Dec = digitalRead(Decrease);
+		Op = digitalRead(Option);
+		Ok = digitalRead(OK);
+		if ((Op==LOW) && (vitri1<3)) {vitri1 +=1; delay(100);}
+      	else if ((Op==LOW) && (vitri1=3)) {vitri1 = 0; delay(100);} 
+		if (Ok==LOW) {break;}		
+		if (Inc==LOW) {Chinhgio(vitri1,1);}
+        if (Dec==LOW) {dieukien(vitri1,-1);}
+      }
+      
+	}
+}
+
+void dieukien(int vitri, int plus1)
+{
+  if ((vitri==1)&&(t>=1)) {Chinhgio(vitri,plus1);} 
+  if ((vitri==2)&&(t>=60)) {Chinhgio(vitri,plus1);} 
+  if ((vitri==3)&&(t>=3600)) {Chinhgio(vitri,plus1);} 
+  if ((vitri==4)&&(secondA>=1)) {Chinhgio(vitri,plus1);} 
+  if ((vitri==5)&&(minuteA>=1)) {Chinhgio(vitri,plus1);} 
+  if ((vitri==6)&&(hourA>=1)) {Chinhgio(vitri,plus1);} 
+}
+
+void Chinhgio(int vitri, int plus1)
+{
+  
+	switch(vitri)
+	{
+		case 1: PLUS+=plus1;			//giay thoi gian
+		break;							
+		case 2: PLUS+=(plus1*60);		//phut thoi gian		
+		break;
+		case 3: PLUS+=(plus1*3600);	//gio thoi gian
+		break;
+		case 4: secondA+=plus1;			//giay bao thuc
+		break;
+		case 5: secondA+=(plus1*60);		//phut bao thuc
+		break;
+		case 6: secondA+=(plus1*3600);	//gio bao thuc
+		break;
+		default:
+		break;
+	}
+}
+
+void Giobaothuc(int hbt, int mbt, int sbt)
+{
+	hbt%=24;
+	mbt%=60;
+	sbt%=60;
+	Hienthi(hbt,mbt,sbt);
+}
+
+void Hienthi(unsigned long h, unsigned long m, unsigned long s)
+{
+  lcd.setCursor(0,1);
+  if (h<10) {lcd.print(0);}
+  lcd.print(h);  
+  lcd.print(":");  
+  if (m<10) {lcd.print(0);}
+  lcd.print(m);  
+  lcd.print(":");
+  if (s<10) {lcd.print(0);}
+  lcd.print(s);
+}
+
+void Nhapnhay(int vitri)
+{
+  	
+  	delay(50);
+	switch(vitri)
+	{
+		case 1:
+		lcd.setCursor(6,1);
+		lcd.print("  ");
+      	Hienthi(hour,minute,second);
+		break;
+		case 2:
+		lcd.setCursor(3,1);
+		lcd.print("  ");
+      	Hienthi(hour,minute,second);
+		break;
+		case 3:
+		lcd.setCursor(0,1);
+		lcd.print("  ");
+      	Hienthi(hour,minute,second);
+		break;
+		case 4:
+		lcd.setCursor(6,1);
+		lcd.print("  ");
+      	Hienthi(hourA,minuteA,secondA);
+		break;
+		case 5:
+		lcd.setCursor(3,1);
+		lcd.print("  ");
+      	Hienthi(hourA,minuteA,secondA);
+		break;
+		case 6:
+		lcd.setCursor(0,1);
+		lcd.print("  ");
+      	Hienthi(hourA,minuteA,secondA);
+		break;
+	}
+}
